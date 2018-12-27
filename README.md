@@ -1,0 +1,2 @@
+# ManoDeDios
+Finger detection software
