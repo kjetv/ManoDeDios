@@ -21,7 +21,7 @@ def run_avg(image, aWeight):
 #-------------------------------------------------------------------------------
 # Function - To segment the region of hand in the image
 #-------------------------------------------------------------------------------
-def segment(image, threshold=25):
+def segment(image, threshold=12):
     global bg
     # find the absolute difference between background and current frame
     diff = cv2.absdiff(bg.astype("uint8"), image)
@@ -34,7 +34,7 @@ def segment(image, threshold=25):
 
     # get the contours in the thresholded image
     (_, cnts, _) = cv2.findContours(thresholded.copy(),
-                                    cv2.RETR_EXTERNAL,
+                                    cv2.RETR_LIST,
                                     cv2.CHAIN_APPROX_SIMPLE)
 
     # return None, if no contours detected
@@ -43,7 +43,9 @@ def segment(image, threshold=25):
     else:
         # based on contour area, get the maximum contour which is the hand
         segmented = max(cnts, key=cv2.contourArea)
-        return (thresholded, segmented)
+        epsilon = 0.01*cv2.arcLength(segmented,True)
+        approx = cv2.approxPolyDP(segmented,epsilon,True)
+        return (thresholded, approx)
 
 #-------------------------------------------------------------------------------
 # Main function
@@ -54,10 +56,8 @@ if __name__ == "__main__":
 
     # get the reference to the webcam
     camera = cv2.VideoCapture(0)
-   
-    #camera.set(cv2.CAP_PROP_AUTO_EXPOSURE, 0.25)
-    #camera.set(cv2.CAP_PROP_EXPOSURE, -1.0)
-
+    camera.set(cv2.CAP_PROP_AUTO_EXPOSURE,0.75)
+    #camera.set(cv2.CAP_PROP_EXPOSURE, 1.0)
     # region of interest (ROI) coordinates
     top, right, bottom, left = 10, 350, 350, 650
 
