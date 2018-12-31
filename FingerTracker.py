@@ -4,27 +4,27 @@ import numpy as np
 
 
 #Global variables
-bg = None
+BACKGROUND = None
 
 #------------------------------------------------------------------------------
 #Function - To find the running average over the background
 #------------------------------------------------------------------------------
 def run_avg(image, aWeight):
-	global bg
+	global BACKGROUND
 	#initialize background
-	if bg is None:
-		bg = image.copy().astype("float")
+	if BACKGROUND is None:
+		BACKGROUND = image.copy().astype("float")
 		return
 	#Compute weighted average, accumulate it and update it
-	cv2.accumulateWeighted(image, bg, aWeight)
+	cv2.accumulateWeighted(image, BACKGROUND, aWeight)
 
 #-------------------------------------------------------------------------------
 # Function - To segment the region of hand in the image
 #-------------------------------------------------------------------------------
 def segment(image, threshold=12):
-    global bg
+    global BACKGROUND
     # find the absolute difference between background and current frame
-    diff = cv2.absdiff(bg.astype("uint8"), image)
+    diff = cv2.absdiff(BACKGROUND.astype("uint8"), image)
 
     # threshold the diff image so that we get the foreground
     thresholded = cv2.threshold(diff,
