@@ -7,7 +7,7 @@ from enum import Enum
 BACKGROUND = None
 
 # Updates and displayes the finger positions
-def FingerTracker():
+def FingerTracker(fingerPosition):
     camera = cv2.VideoCapture(0)
     camera.set(cv2.CAP_PROP_AUTO_EXPOSURE,0.75) # 0.25 turns off, 0.75 turns on
     
@@ -15,8 +15,11 @@ def FingerTracker():
 
     aWeight = 0.5
     num_frames = 0
+    maxRadius = 1.0
+    minRadius = 99999.0
 
     while(True):
+
         (grabbed, mainFrame) = camera.read()
         mainFrame = imutils.resize(mainFrame, width=700)
         mainFrame = cv2.flip(mainFrame, 1)
@@ -29,15 +32,24 @@ def FingerTracker():
 
         if num_frames < 30:
             backgroundAveraging(HandRegion, aWeight)
+            fingerPosition.put(0)
             num_frames += 1
         else:
             hand = segment(HandRegion)
             if hand is not None:
                 (thresholded, segmented, center, radius) = hand
+                if radius > maxRadius:
+                    maxRadius = radius
+                if radius < minRadius:
+                    minRadius = radius
                 cv2.imshow("Thesholded", thresholded)
                 center = (center[0]+HandPerimiterRight,center[1]+HandPerimiterTop)
                 cv2.drawContours(mainFrame, [segmented + (HandPerimiterRight, HandPerimiterTop)], -1, (0, 0, 255))
                 cv2.circle(mainFrame, center, radius, (255,0,0), 2)
+                
+                radius = float(radius)
+                fingerPosition.put(minRadius/maxRadius*radius)
+                print("radius:" + str(radius) + "maxRadius: " + str(maxRadius) + "minRadius: " +str(minRadius))
         
         cv2.imshow("Video Feed", mainFrame)
 
@@ -99,6 +111,6 @@ def segment(image, threshold=12):
         center = (int(x),int(y))
         radius = int(radius)
         out = cv2.linearPolar(thresholded, center, 100, cv2.INTER_LINEAR+cv2.WARP_FILL_OUTLIERS)
-        print(radius)
+        #print(radius)
         return (out, approx, center, radius)
 
