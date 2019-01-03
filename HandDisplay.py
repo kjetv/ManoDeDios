@@ -9,8 +9,10 @@ from direct.interval.IntervalGlobal import Sequence
 from panda3d.core import Point3
  
 def Hand(fingerInput):
-	app = MyHand(fingerInput)
-	app.run()
+    app = MyHand(fingerInput)
+    app.run()
+    print("hei")
+
 
 
 class MyHand(ShowBase):
@@ -33,8 +35,13 @@ class MyHand(ShowBase):
 
     def moveFingers(self, task):
         #self.Hand.listJoints()
-        angleDegrees = 90*self.fingerPositions.get() #task.time * 100.0
+        angleDegrees = self.fingerPositions.get() #task.time * 100.0
         #print(angleDegrees)
+        if angleDegrees != "quit":
+            angleDegrees *= 90
+        else:
+            self.destroy()
+            return task.done
         fingerList = ["pinky","ring","middle","index","thumb"]
         jointNumber = 3
         for finger in fingerList:

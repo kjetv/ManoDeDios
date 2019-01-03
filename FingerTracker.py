@@ -40,21 +40,25 @@ def FingerTracker(fingerPosition):
                 (thresholded, segmented, center, radius) = hand
                 if radius > maxRadius:
                     maxRadius = radius
-                if radius < minRadius:
+                if radius < minRadius and radius != maxRadius:
                     minRadius = radius
+                else:
+                    maxRadius = maxRadius - 0.1
+                    minRadius = minRadius + 0.1
                 cv2.imshow("Thesholded", thresholded)
                 center = (center[0]+HandPerimiterRight,center[1]+HandPerimiterTop)
                 cv2.drawContours(mainFrame, [segmented + (HandPerimiterRight, HandPerimiterTop)], -1, (0, 0, 255))
                 cv2.circle(mainFrame, center, radius, (255,0,0), 2)
                 
                 radius = float(radius)
-                fingerPosition.put(minRadius/maxRadius*radius)
+                fingerPosition.put((radius-minRadius)/(maxRadius-minRadius))
                 print("radius:" + str(radius) + "maxRadius: " + str(maxRadius) + "minRadius: " +str(minRadius))
         
         cv2.imshow("Video Feed", mainFrame)
 
         keypress = cv2.waitKey(1) & 0xFF
         if keypress == ord("q"):
+            fingerPosition.put("quit")
             break
 
     camera.release()
