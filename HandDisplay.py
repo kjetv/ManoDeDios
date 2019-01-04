@@ -21,9 +21,9 @@ class MyHand(ShowBase):
         self.fingerPositions = fingerInput;
  
         self.disableMouse()
-        tex = loader.loadTexture('HandTexture.png')
+        tex = loader.loadTexture('HandModel/HandTexture.png')
 
-        self.Hand = Actor("Hand.egg")
+        self.Hand = Actor("HandModel/Hand.egg")
         self.Hand.setScale(1.5, 1.5, 1.5)
         self.Hand.setTexture(tex, 1)
 
